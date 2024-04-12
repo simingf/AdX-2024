@@ -150,8 +150,8 @@ class Campaign:
         return self._impressions 
     
     @cumulative_reach.setter 
-    def cumulative_reach(self, add):
-        self._impressions += add
+    def cumulative_reach(self, impressions):
+        self._impressions = impressions
 
     
     @property 
@@ -159,8 +159,8 @@ class Campaign:
         return self._costs
 
     @cumulative_cost.setter 
-    def cumulative_cost(self, add):
-        self._costs += add
+    def cumulative_cost(self, costs):
+        self._costs = costs
 
     def __repr__(self):
         return "{}(uid: {}, reach: {}, budget: {}, target: {})".format(self.__class__.__name__,
