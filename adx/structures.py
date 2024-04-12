@@ -181,7 +181,7 @@ class BidBundle:
     limit: float 
     bid_entries: Set[Bid]
 
-    def __init__(self, campaign_id, limit, bid_entries):
+    def __init__(self, campaign_id : int, limit : float, bid_entries : Set[Bid]):
         self.campaign_id = campaign_id 
         self.limit = limit 
         self.bid_entries = bid_entries 
