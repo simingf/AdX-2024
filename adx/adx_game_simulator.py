@@ -124,7 +124,7 @@ class AdXGameSimulator:
         bid = bid.bid_per_item
         return isfinite(bid) and bid > 0
 
-    def run_ad_auctions(self, bid_bundles : List[BidBundle], users: List[MarketSegment]) -> None:
+    def run_ad_auctions(self, bid_bundles : List[BidBundle], users: List[MarketSegment], day: int) -> None:
         bidder_states = self.states
         # Map for market_segment to bid
         seg_to_bid = defaultdict(set)
@@ -136,6 +136,12 @@ class AdXGameSimulator:
         bid_to_spend = dict()
         for bid_bundle in bid_bundles:
             daily_limits[bid_bundle.campaign_id] = bid_bundle.limit 
+            # If campaign does not exist throw-away the bid bundle
+            if bid_bundle.campaign_id not in self.campaigns: continue 
+            # If campaign is not active throw-away the bid bundle
+            campaign = self.campaigns[bid_bundle.campaign_id]
+            if not (campaign.start_day <= day and campaign.end_day >= day): continue
+            
             for bid in bid_bundle.bid_entries:
                 if self.is_valid_bid(bid):
                     bid_to_bundle[bid] = bid_bundle 
@@ -205,6 +211,7 @@ class AdXGameSimulator:
                 winner.my_campaigns.add(campaign)
                 winner_state = self.states[winner]
                 winner_state.add_campaign(campaign)
+                self.campaigns[campaign.uid] = campaign
 
     def generate_auction_items(self, num_items: int) -> List[MarketSegment]:
         return [item for item in self.user_segment_dist.draw_n(num_items, replace=True)]
@@ -243,6 +250,7 @@ class AdXGameSimulator:
         total_profits = {agent : 0.0 for agent in agents}
         for i in range(num_simulations):
             self.states = self.init_agents(agents)
+            self.campaigns = dict()
             # Initialize campaigns 
             for agent in self.agents:    
                     agent.current_game = i + 1 
@@ -252,6 +260,7 @@ class AdXGameSimulator:
                     random_campaign.budget = random_campaign.reach
                     agent_state.add_campaign(random_campaign)
                     agent.my_campaigns.add(random_campaign)
+                    self.campaigns[random_campaign.uid] = random_campaign
 
             for day in range(1, self.num_days + 1):
                 # Update 
@@ -272,7 +281,7 @@ class AdXGameSimulator:
                 for agent in self.agents:
                     ad_bids.extend(agent.get_ad_bids())
                 users = self.generate_auction_items(10000)
-                self.run_ad_auctions(ad_bids, users)
+                self.run_ad_auctions(ad_bids, users, day)
 
                 # Update campaign states, quality scores, and profits
                 for agent in self.agents:
@@ -310,6 +319,7 @@ class AdXGameSimulator:
                         random_campaign.budget = random_campaign.reach
                         agent_state.add_campaign(random_campaign)
                         agent.my_campaigns.add(random_campaign)
+                        self.campaigns[random_campaign.uid] = random_campaign
             for agent in self.agents:
                 total_profits[agent] += self.states[agent].profits 
             self.print_game_results()
