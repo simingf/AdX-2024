@@ -10,7 +10,7 @@ class MyNDaysNCampaignsAgent(NDaysNCampaignsAgent):
         # TODO: fill this in (if necessary)
         super().__init__()
         self.name = "Bajas #1"  # DONE: enter a name.
-        self.b_a =  3.08577 / 4.08577 # b/a, optimal for second derivative test
+        self.b_a =  3.08577 / 4.08577 + 0.1 # b/a, optimal for second derivative test
         self.threshold = 0.5
         self.discount_factor = 0.5
 
@@ -28,7 +28,7 @@ class MyNDaysNCampaignsAgent(NDaysNCampaignsAgent):
             if effective_reach == 0:
                 bid_per_item = 0
             else:
-                factor = self.b_a if self.current_day >= 3 else 1
+                factor = self.b_a if self.current_day >= 4 else 1.2
                 bid_per_item = factor * (effective_budget) / (effective_reach)
             
             bid_entries = set()
