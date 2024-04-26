@@ -9,7 +9,10 @@ class MyNDaysNCampaignsAgent(NDaysNCampaignsAgent):
     def __init__(self):
         # TODO: fill this in (if necessary)
         super().__init__()
-        self.name = ""  # TODO: enter a name.
+        self.name = "Bajas #1"  # DONE: enter a name.
+        self.b_a =  3.08577 / 4.08577 # b/a, optimal for second derivative test
+        self.threshold = 0.5
+        self.discount_factor = 0.5
 
     def on_new_game(self) -> None:
         # TODO: fill this in (if necessary)
@@ -18,14 +21,34 @@ class MyNDaysNCampaignsAgent(NDaysNCampaignsAgent):
     def get_ad_bids(self) -> Set[BidBundle]:
         # TODO: fill this in
         bundles = set()
+        for campaign in self.get_active_campaigns():
+            effective_budget = campaign.budget - self.get_cumulative_cost(campaign)
+            effective_reach = campaign.reach - self.get_cumulative_reach(campaign)
+            
+            if effective_reach == 0:
+                bid_per_item = 0
+            else:
+                factor = self.b_a if self.current_day >= 3 else 1
+                bid_per_item = factor * (effective_budget) / (effective_reach)
+            
+            bid_entries = set()
+            bid_entries.add(Bid(bidder=self, auction_item=campaign.target_segment, bid_per_item=bid_per_item, bid_limit=effective_budget))
+            
+            bundle = BidBundle(campaign_id=campaign.uid, limit=effective_budget, bid_entries=bid_entries)
+            bundles.add(bundle)
 
         return bundles
-
+    
     def get_campaign_bids(self, campaigns_for_auction:  Set[Campaign]) -> Dict[Campaign, float]:
-        # TODO: fill this in 
-        bids = {}
-
-        return bids
+        # TODO: fill this in
+        return {}
+        # # Current Strategy: Not bidding on any other campaigns! Focusing on completing our current ones
+        # bids = {}
+        # for campaign in campaigns_for_auction:
+        #     if (campaign.budget / campaign.reach) > self.threshold:
+        #         bid_value = (campaign.budget) * self.discount_factor
+        #         bids[campaign] = bid_value
+        # return bids
 
 if __name__ == "__main__":
     # Here's an opportunity to test offline against some TA agents. Just run this file to do so.
