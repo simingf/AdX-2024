@@ -28,8 +28,11 @@ class MyNDaysNCampaignsAgent(NDaysNCampaignsAgent):
             if effective_reach == 0:
                 bid_per_item = 0
             else:
-                factor = self.b_a if self.current_day >= 4 else 1.2
+                factor = self.b_a if self.current_day >= 4 else 1
                 bid_per_item = factor * (effective_budget) / (effective_reach)
+
+            quality_score = self.get_quality_score()
+            print(f"Effective Budget: {effective_budget}, Effective Reach: {effective_reach}, Bid per Item: {bid_per_item}, Quality Score: {quality_score}")
             
             bid_entries = set()
             bid_entries.add(Bid(bidder=self, auction_item=campaign.target_segment, bid_per_item=bid_per_item, bid_limit=effective_budget))
@@ -41,6 +44,10 @@ class MyNDaysNCampaignsAgent(NDaysNCampaignsAgent):
     
     def get_campaign_bids(self, campaigns_for_auction:  Set[Campaign]) -> Dict[Campaign, float]:
         # TODO: fill this in
+        current_day = self.current_day
+        # for campaign in campaigns_for_auction:
+            # print(campaign.start_day - current_day == 1)
+
         return {}
         # # Current Strategy: Not bidding on any other campaigns! Focusing on completing our current ones
         # bids = {}
@@ -56,4 +63,4 @@ if __name__ == "__main__":
 
     # Don't change this. Adapt initialization to your environment
     simulator = AdXGameSimulator()
-    simulator.run_simulation(agents=test_agents, num_simulations=500)
+    simulator.run_simulation(agents=test_agents, num_simulations=100)
