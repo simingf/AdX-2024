@@ -12,7 +12,6 @@ class MyNDaysNCampaignsAgent(NDaysNCampaignsAgent):
         # TODO: fill this in (if necessary)
         super().__init__()
         self.name = "Bajas #1"  # DONE: enter a name.
-        self.campaign_tracker = campaign_utils.CampaignTracker()
 
     def on_new_game(self) -> None:
         # TODO: fill this in (if necessary)
@@ -21,38 +20,21 @@ class MyNDaysNCampaignsAgent(NDaysNCampaignsAgent):
     def get_ad_bids(self) -> Set[BidBundle]:
         # TODO: fill this in
         bundles = set()
-        current_day = self.current_day
-
-        # Get counts for how often a given segment appears in active campaigns.
-        overlappingSegments = {}
-        for campaign in self.get_active_campaigns():
-            competitors = campaign_utils.competitor_segments(campaign.target_segment)
-            for segment in competitors:
-                overlappingSegments[segment] = overlappingSegments.get(segment, 0) + 1
-
-        # Get the value of each segment.
-        segmentValues = {}
-        for segment in overlappingSegments:
-            segmentValues[segment] = campaign_utils.segment_value(segment, self.get_active_campaigns())
 
         for campaign in self.get_active_campaigns():
-            effective_budget = campaign.budget - self.get_cumulative_cost(campaign)
-            effective_reach = campaign.reach - self.get_cumulative_reach(campaign)
-            bid_per_item = segmentValues[campaign.target_segment] * (effective_budget) / (effective_reach) if effective_reach != 0 else 0
-
-            quality_score = self.get_quality_score()
-            print(f"Effective Budget: {effective_budget}, Effective Reach: {effective_reach}, Bid per Item: {bid_per_item}, Quality Score: {quality_score}")
+            shade = campaign_utils.campaign_shade(campaign, self.get_active_campaigns())
+            budget_remaining = campaign.budget - campaign.cumulative_cost
+            reach_remaining = campaign.reach - campaign.cumulative_reach
+            bid_per_item = shade * (budget_remaining) / (reach_remaining) if reach_remaining != 0 else 0
             
             bid_entries = set()
-            bid_entries.add(Bid(bidder=self, auction_item=campaign.target_segment, bid_per_item=bid_per_item, bid_limit=effective_budget))
+            bid_entries.add(Bid(bidder=self, auction_item=campaign.target_segment, bid_per_item=bid_per_item, bid_limit=budget_remaining))
             
-            bundle = BidBundle(campaign_id=campaign.uid, limit=effective_budget, bid_entries=bid_entries)
+            bundle = BidBundle(campaign_id=campaign.uid, limit=budget_remaining, bid_entries=bid_entries)
             bundles.add(bundle)
         return bundles
     
     def get_campaign_bids(self, campaigns_for_auction:  Set[Campaign]) -> Dict[Campaign, float]:
-        # Simple approach: bid a shaded portion for each campaign. 
-        self.campaign_tracker.update_auctions(self.current_day)
         bids = {}
         for campaign in campaigns_for_auction:
             market_segment = campaign.target_segment
@@ -78,4 +60,4 @@ if __name__ == "__main__":
 
     # Don't change this. Adapt initialization to your environment
     simulator = AdXGameSimulator()
-    simulator.run_simulation(agents=test_agents, num_simulations=500)
+    simulator.run_simulation(agents=test_agents, num_simulations=100)
