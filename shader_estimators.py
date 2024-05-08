@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+# Deep Learning Exploration
+
 class Estimator():
     @abstractmethod
     def returnShadeValue(self, *args):
