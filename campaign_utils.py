@@ -16,10 +16,9 @@ class CampaignTracker:
         for campaign in self.current_auctions:
             if campaign.end_day < day: # if ended
                 self.current_auctions.remove(campaign)
+
     def add_to_pending(self, campaign):
         self.pending_auctions.append(campaign)
-
-
 
 segment_dict = {
         MarketSegment(("Male", "Young")): {"Male", "Young"},
@@ -51,11 +50,11 @@ def competitor_segments(base_set):
             biddable_segments.add(segment)
     return biddable_segments
 
-def segment_value(segment : MarketSegment, allCampigns : list[Campaign]): # represents a segment's worth
+def segment_value(segment : MarketSegment, allCampaigns : list[Campaign]): # represents a segment's worth
     cumulative_reach = 0
     possible_total_reach = 0
     competitors = competitor_segments(segment)
-    for campaign in allCampigns:
+    for campaign in allCampaigns:
         if campaign.target_segment in competitors:
             day_factor = 1 / (campaign.end_day - campaign.start_day + 1) # less reach per day if longer campaign
             cumulative_reach += campaign.reach * day_factor
