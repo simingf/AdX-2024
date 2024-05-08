@@ -28,10 +28,7 @@ class MyNDaysNCampaignsAgent(NDaysNCampaignsAgent):
         for campaign in self.get_active_campaigns():
             competitors = campaign_utils.competitor_segments(campaign.target_segment)
             for segment in competitors:
-                if segment in overlappingSegments:
-                    overlappingSegments[segment] += 1
-                else:
-                    overlappingSegments[segment] = 1
+                overlappingSegments[segment] = overlappingSegments.get(segment, 0) + 1
 
         # Get the value of each segment.
         segmentValues = {}
