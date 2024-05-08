@@ -73,8 +73,8 @@ def campaign_shade(my_campaign : Campaign, allCampaigns : list[Campaign]):
     my_effective_reach = calculate_effective_reach(my_campaign.cumulative_reach, my_campaign.reach)
 
     if my_effective_reach == 0:
-        # we have no effective reach
-        return shade
+        # we have no effective reach, we need to bid more
+        return min(shade * 1.1, 1)
 
     count = 0
     sum_other_effective_reach = 0
@@ -92,7 +92,7 @@ def campaign_shade(my_campaign : Campaign, allCampaigns : list[Campaign]):
 
     if my_effective_reach < average_other_effective_reach:
         # we have low effective reach, we need more impressions, bid more
-        return shade
+        return min(shade * 1.1, 1)
     else:
         # we have high effective reach, we already doing fine, bid less
         return shade * (average_other_effective_reach / my_effective_reach)
