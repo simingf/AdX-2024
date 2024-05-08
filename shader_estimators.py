@@ -6,9 +6,8 @@ class Estimator():
     def returnShadeValue(self, *args):
         pass
 
-class AlgorithmicEstimatedReach(Estimator):
-    pass
-
+# class AlgorithmicEstimatedReach(Estimator):
+#     pass
 
 '''
 Recurrent network implementation. The idea of this is to utilize deep learning to
@@ -16,8 +15,8 @@ gain a meaning representation of previous states to yield a shading value. This 
 is then multiplied to the bid to determine how much we should pay for any given
 moment. 
 
-This was to be trained in recurrent.ipynb, but idea was not implemented because
-of concerns of the objective function. 
+This was to be trained in deep_learning.ipynb. Details are provided in the 
+writeup and in the notebook to provide additional context for directions.
 '''
 class RecurrentEstimator(Estimator):
     def __init__(self, input_dim, hidden_dim, num_layers, output_dim):
